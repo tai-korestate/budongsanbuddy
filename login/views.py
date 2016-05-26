@@ -4,32 +4,6 @@ from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect
 # Create your views here.
-'''
-def signup(request):
-    status = ''
-    if request.method == "POST":
-        try:
-            preq = request.POST
-            user_ed = User()
-            user_ed.password = sha256(preq['drwsp'])
-            user_ed.first_name = preq["co_name"]
-            user_ed.last_name = preq["phone_num"]
-            user_ed.email = preq["email"]
-            user_ed.username = preq["email"]
-            user_ed.save()
-
-            status = "Submission Complete"
-            return HttpResponseRedirect("/accounts")
-            
-        except:
-            status = "Error During Submission."
-
-    template = "signup.html"
-    context = {"welcome":"welcome",
-               "status": status,
-              }
-    return render(request,template,context) 
-'''
 
 
 def signup(request):
@@ -76,19 +50,18 @@ def login_user(request):
     
     status = "Problem with auth"
     user = authenticate(username = username, password = password)
-
    
     if user is not None:
         if user.is_active:
             login(request,user)
             return HttpResponseRedirect('/submit')
-
         else:
             return HttpResponse("Disabled Account")
 
     else:
         status = "Invalid Sign in"
         return HttpResponse("Invalid Login: %s" % status)
+
 
 def logout_view(request):
     logout(request)
