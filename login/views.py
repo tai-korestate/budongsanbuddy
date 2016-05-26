@@ -53,15 +53,10 @@ def signup(request):
                }
     return render(request, template, context)
 
-             
-           
 
-    
 def login_form(request):
     template = "accounts.html"
-   
     context = {'welcome':'welcome'}
-  
     return render(request, template, context)
 
 
@@ -75,15 +70,14 @@ def login_user(request):
         
     try:
         password = request.POST['password'] #Add Filtering here
-        print password
+   
     except:
         status = "problem with username"    
     
     status = "Problem with auth"
     user = authenticate(username = username, password = password)
-    print user
+
    
- 
     if user is not None:
         if user.is_active:
             login(request,user)
