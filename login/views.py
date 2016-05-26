@@ -17,6 +17,7 @@ def signup(request):
                      first_name =  u_data['co_name'],
                      last_name =  u_data['phone_num'],
                      )
+                     
             user_creator.save()
             status = "Submission Complete"
             return HttpResponseRedirect("/submit")
@@ -25,6 +26,7 @@ def signup(request):
     context = {"welcome":"welcome",
                "status":"status"
                }
+               
     return render(request, template, context)
 
 
