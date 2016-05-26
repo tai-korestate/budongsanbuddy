@@ -11,6 +11,7 @@ TO DO: (PRIORITY:: greatest *** -> * least )
 -Migrate the db to a MySQL ***
 -Build a backend API that dumps backend data into json for parsing ***
 -TESTS TESTS TESTS **
+-FIX IMAGES.
 
 
 
