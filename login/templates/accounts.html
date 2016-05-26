@@ -1,0 +1,12 @@
+
+{{ welcome }}
+
+<form action = '/accounts/login/' method = 'POST'>
+        {% csrf_token %}
+        <h1>login page</h1><br/>
+        email: <input name = "email" type = "email"><br/>
+        password: <input name = "password" type = "password"><br/>
+        <input type = "submit">
+</form>
+
+<a href = 'signup' >sign up</a>
