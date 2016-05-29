@@ -1,12 +1,16 @@
 from django.contrib.auth.models import User
-from hashlib import sha1
+from hashlib import sha256
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect
 # Create your views here.
 
 
+
 def signup(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect("/submit")
+
     status = ''
     if request.method == 'POST':
             u_data = request.POST   
@@ -31,12 +35,18 @@ def signup(request):
 
 
 def login_form(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect('/submit')
+
     template = "accounts.html"
     context = {'welcome':'welcome'}
     return render(request, template, context)
 
 
 def login_user(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect('/submit')
+
     status = "Unknown"
  
     try:
