@@ -130,9 +130,16 @@ def edit_manager(request):  #No status return yet
             '''
 
             Properties.objects.all().filter(pk = int(commands['ord']))
-            return HttpResponseRedirect('/submit')
-
+            return HttpResponseRedirect('/submit/page')
+            
     except:
         return HttpResponseRedirect('/submit')
        
+
+
+def edit_mode(request):
+    commands = request.GET
+    script = ""    
+
+
 

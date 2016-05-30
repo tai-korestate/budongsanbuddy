@@ -15,6 +15,8 @@ class Properties(models.Model):
     broker_name = models.CharField(max_length = 15)
     property_name = models.CharField(max_length = 255)
     phone_number = models.CharField(max_length = 15)
+    radio_array = models.CharField(max_length = 255)  
+  
     class Meta:
         unique_together = ["pics","description","broker_name","property_name","phone_number"]
 

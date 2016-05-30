@@ -12,9 +12,11 @@ def signup(request):
         return HttpResponseRedirect("/submit")
 
     status = ''
-    if request.method == 'POST':
-            u_data = request.POST   
-            user_creator = User.objects.create_user(
+
+    try:
+        if request.method == 'POST':
+                u_data = request.POST   
+                user_creator = User.objects.create_user(
                      username = u_data['email'],
                      email =  u_data['email'],
                      password =  u_data['drwsp'],
@@ -22,10 +24,18 @@ def signup(request):
                      last_name =  u_data['phone_num'],
                      )
                      
-            user_creator.save()
-            status = "Submission Complete"
-            return HttpResponseRedirect("/submit")
-    
+                user_creator.save()
+                status = "Submission Complete"
+                return HttpResponseRedirect("/submit")
+   
+    except ValueError:
+        return HttpResponseRedirect("/accounts/fail?err=Please fill out all fields.")
+    except NameError:
+        return HttpResponseRedirect("/accounts/fail?err=That username or email has already been registered.")
+
+    except:
+        return HttpResponseRedirect("/accounts/fail?err=UserName already in use.")
+ 
     template = "signup.html"
     context = {"welcome":"welcome",
                "status":"status"
@@ -68,13 +78,27 @@ def login_user(request):
             login(request,user)
             return HttpResponseRedirect('/submit')
         else:
-            return HttpResponse("Disabled Account")
+            return HttpResponse("/fail?err=Disabled Account")
 
     else:
         status = "Invalid Sign in"
-        return HttpResponse("Invalid Login: %s" % status)
+        return HttpResponseRedirect("/accounts/fail?err=Invalid Login: Please fillout all fields")
+
 
 
 def logout_view(request):
     logout(request)
-    return HttpResponseRedirect("/accounts") 
+    return HttpResponseRedirect("/accounts")
+
+
+def status(request):
+
+    if request.GET:
+        status = "Error: %s" % request.GET['err']
+    else:
+        status = "Error 404"
+
+    template = "status.html"
+    context = {"status_message" : status}
+
+    return render(request, template, context) 
