@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# submit views
 
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -23,10 +21,12 @@ def assemble_post_views(prop_obj):
     description: {description}<br/>
     contact: {phone_num}
     last modified on {last_mod}
-     
-    <a href = "/submit/edit?del=1&ord={pk}"> delete </a>  <!-- Needs a Conf Dialogue -->
-    <a href = "/submit/edit?ed=1&ord={pk}"> edit </a>
-    <a href = ""> view translation </a> <!-- This is going to go to a js script-->
+    <ul style = "list-style-type: none"> 
+    <li><a href = "/submit/edit?del=1&ed=0&ord={pk}"> delete </a></li>  <!-- Needs a Conf Dialogue -->
+    <li><a href = "/submit/edit?del=2&ed=1&ord={pk}"> edit </a></li>
+    </ul>
+    <!--
+    <a href = ""> view translation </a> --><!-- This is going to go to a js script-->
     </div><br/>>
     """.encode('utf-8')
 
@@ -79,12 +79,11 @@ def submit(request):
         db_fetch.property_name = prop_info["prop_name"]
         db_fetch.description = prop_info["description"]
         db_fetch.phone_number = prop_info["phone_number"]        
-
         db_fetch.save() 
         status = "Post Submitted" 
 
     else:
-        status = "Write error.  Try again or contact support."
+        status = "Enter Info to add to Korestate DB"
     
     
     test_site = ts.test_site()
@@ -104,17 +103,16 @@ def submit(request):
 
 
 def edit_manager(request):  #No status return yet
-
+    commands = request.GET
     try:
-        commands = request.GET
         command_list = tuple(commands[key] for key in commands)
-        print ":::///Taking from Get:", commands['ord']
-        
+        print ":::///Taking from Get:", command_list
         if len(command_list) < 2:
             return HttpResponseRedirect('/submit')
         
         #Delete Mode
-        if commands['del'] == u'1':
+        print 'COMMANDS',commands 
+        if commands[u'del'] == u'1':
             try:
                 Properties.objects.all().filter(pk = int(commands['ord'])).delete()
                 return HttpResponseRedirect('/submit')
@@ -122,24 +120,60 @@ def edit_manager(request):  #No status return yet
             except:
                 return HttpResponseRedirect('/submit')
 
-
         #Edit Mode
-        elif commands['ed'] == u'1':
-            '''
-            Sends the info to the submit page with a flag to update
-            '''
-
-            Properties.objects.all().filter(pk = int(commands['ord']))
-            return HttpResponseRedirect('/submit/page')
+        if commands[u'ed'] == u'1':
+            print "EDIT RECEIVED"
+            #Properties.objects.all().filter(pk = int(commands['ord']))
+            
+            redirect_string = '/submit/edit/page?ed=1&ky={key}'.format(key = int(commands['ord']))
+            return HttpResponseRedirect(redirect_string)
             
     except:
+        print "ERROR in edit_manager"
         return HttpResponseRedirect('/submit')
        
 
 
 def edit_mode(request):
-    commands = request.GET
-    script = ""    
+    print "EDIT MODE"
+    print "NEW REQ,", request.GET
+    status = "Please Type Changes and click submit."
+    try:
+        if request.GET['revisions'] == 't':
+            update_req = request.POST
+            print "REQ INFO", update_req
+            to_update = Properties.objects.all().filter(pk = update_req[u'pk'])[0]
+            print "UPDATING...", to_update
+            to_update.broker_name = update_req[u'broker_name'] 
+            to_update.property_name = update_req[u'property_name']
+            to_update.description = update_req[u'description']
+            to_update.radio_array = update_req[u'radio_array']
+            to_update.save()
+            status = "Changes Successfully Made  <a href = '/submit'> go back</a> "
 
+    except:
+        status = "Update error"
+    
+    try:
+        edit_conf = request.GET['ed']
+        edit_key = request.GET['ky']
+               
 
+    except:
+        return HttpResponseRedirect('/accounts/fail?err=Database Error 404::Bad Navigation')
+    
 
+    db_fetch = Properties.objects.all().filter(pk=edit_key)[0]
+    template = "edit_site.html"
+    prop_sheet = {
+        "pk" : db_fetch.pk,
+        "pics" : db_fetch.pics,     
+        "broker_name" : db_fetch.broker_name,
+        "property_name" : db_fetch.property_name,
+        "description" :  db_fetch.description,
+        "phone_number" :  db_fetch.phone_number,
+        "radio_array" :   db_fetch.radio_array,      
+        "status" : status
+    }
+
+    return render(request, template, prop_sheet)
