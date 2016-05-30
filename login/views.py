@@ -26,7 +26,7 @@ def signup(request):
                      
                 user_creator.save()
                 status = "Submission Complete"
-                return HttpResponseRedirect("/submit")
+                return HttpResponseRedirect("/accounts/fail?err=signup successful")
    
     except ValueError:
         return HttpResponseRedirect("/accounts/fail?err=Please fill out all fields.")
@@ -94,7 +94,7 @@ def logout_view(request):
 def status(request):
 
     if request.GET:
-        status = "Error: %s" % request.GET['err']
+        status = "%s" % request.GET['err']
     else:
         status = "Error 404"
 

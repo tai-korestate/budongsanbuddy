@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from . import test_site as ts
 #from . import post_obj_ops as po
 from .models import Properties
-from .forms  import PicForm
+from .forms  import PicForm,radio_mach
 
 
 def assemble_post_views(prop_obj):
@@ -15,8 +15,11 @@ def assemble_post_views(prop_obj):
 
     frame = """
     <br/><div style = "height: auto; width: 60%; border: 1px black solid; border-rotation: 5px; box-shadow: 3px grey;">
-    <img src = "{image}" style = ></img>
-    property_name: {prop_name}<br/>
+    <img src = "{image}" style = "height: 50px"></img>
+    <img src = "{image2}" style = "height: 50px"></img>
+    <img src = "{image3}" style = "height: 50px"></img><br/>
+
+     property_name: {prop_name}<br/>
     posted_by {broker} on {postdate}<br/>
     description: {description}<br/>
     contact: {phone_num}
@@ -31,6 +34,8 @@ def assemble_post_views(prop_obj):
     """.encode('utf-8')
 
     return unicode(frame).format(image ='/media/' + str(p.pics),
+                        image2 = '/media/' + str(p.pics2),
+                        image3 = '/media/' + str(p.pics3),
                         prop_name = p.property_name,
                         broker = p.broker_name,
                         postdate = p.post_date,
@@ -49,7 +54,7 @@ def submit(request):
         return redirect(settings.LOGIN_URL, request.path)
 
     commands = request.GET
-
+   
     status = ""
     # This takes care of the account verification
     account_hash = request.user.username
@@ -60,20 +65,32 @@ def submit(request):
 
     #Handles Post Bullshit
  
-    
-    
+    radio_form = radio_mach()    
+    radio_html = radio_form.gen_html()   
+ 
     pic_form = PicForm(request.POST, request.FILES)    
-    
-    print pic_form.is_valid()
+    pic_form2 = PicForm(request.POST, request.FILES)
+    pic_form3 = PicForm(request.POST, request.FILES)
+    #print pic_form.is_valid()
 
     if request.method == 'POST' and pic_form.is_valid():
         db_fetch = Properties()
         prop_info = request.POST         
-        
+        print "USSSSEEEEERRRRRR", request.FILES
+        db_fetch.db_user = 'ass'  
+
         if pic_form.is_valid():
-            db_fetch.pics = request.FILES['picform']     
-        print request.FILES
-   
+            db_fetch.pics = request.FILES.getlist('picform')[0]     
+        #print request.FILES
+  
+        if pic_form2.is_valid():
+            db_fetch.pics2 = request.FILES.getlist('picform')[1]    
+        
+        if pic_form3.is_valid():
+            db_fetch.pics3 = request.FILES.getlist('picform')[2]     
+        
+
+ 
         db_fetch.account_ref = account_hash
         db_fetch.broker_name = prop_info["broker_name"]
         db_fetch.property_name = prop_info["prop_name"]
@@ -95,7 +112,10 @@ def submit(request):
     context = {"submit_form" : test_site,
                 "post_list" : post_list,   
                 "status" : status,
-                "image_form" : PicForm(request.POST, request.FILES)  
+                "image_form" : pic_form,  
+                "image_form2" : pic_form,
+                "image_form3" : pic_form,
+                "radio_form" : radio_html,
               } 
    
     return render(request,template,context)
@@ -167,13 +187,13 @@ def edit_mode(request):
     template = "edit_site.html"
     prop_sheet = {
         "pk" : db_fetch.pk,
-        "pics" : db_fetch.pics,     
+        "pics" : [db_fetch.pics, db_fetch.pics2, db_fetch.pics3],     
         "broker_name" : db_fetch.broker_name,
         "property_name" : db_fetch.property_name,
         "description" :  db_fetch.description,
         "phone_number" :  db_fetch.phone_number,
         "radio_array" :   db_fetch.radio_array,      
-        "status" : status
+        "status" : status,
     }
 
     return render(request, template, prop_sheet)

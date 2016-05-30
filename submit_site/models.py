@@ -6,11 +6,15 @@ from django.db import models
 
 class Properties(models.Model):
 
+    db_user = "unknown"
+
     account_ref = models.CharField(max_length = 64)
 
     post_date = models.DateTimeField("Date Posted", auto_now_add = True)
     last_edit = models.DateTimeField("Last Edited", auto_now = True)
-    pics = models.FileField(upload_to = 'testdir')
+    pics = models.FileField(upload_to = db_user)
+    pics2 = models.FileField(upload_to = db_user)
+    pics3 = models.FileField(upload_to = db_user)
     description = models.CharField(max_length = 255)
     broker_name = models.CharField(max_length = 15)
     property_name = models.CharField(max_length = 255)
