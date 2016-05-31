@@ -28,7 +28,7 @@ class RadioForm(object):
 
         js_frame = "{text}: $('#{text}').val(),"
 
-        frame = "{feature} <input type = 'radio' value = 'True' name = '{feature}'><input type = 'radio' value = 'False' name= '{feature}'><br/>"
+        frame = "{feature} <input type = 'radio' value = 'True' name = '{feature}'><input type = 'radio' value = 'False' name= '{feature}' checked = 'checked'><br/>"
 
         return_list = []
         js_list = []
@@ -43,10 +43,38 @@ class RadioForm(object):
 
         return self.htmlframe
 
+    def gen_storable(self,postdata):
+        return_list = []
+        for key in postdata:
+            if key in self.list_traits:
+                print key
+                return_list.append((key,postdata[key]))
+        return str(dict(return_list))
+
+
+
     #def for_db(json_obj):
        #for entry in self.list_traits
      
+    def gen_for_edit(self,postdata):
+        '''
+        postdata needs to be a dictionary from database
+        '''
+        print "sdjhaslkfja;sldkjf;asldkjf;laksjdfkajsdf", postdata
+        temp_list = []
+        for key in postdata:
+            print "KEEEEEYS", postdata[key]
+            if postdata[key][0] == 'False': 
+                frame = "{feature} <input type = 'radio' value = 'True' name = '{feature}'><input type = 'radio' value = 'False' name= '{feature}' checked = 'checked'><br/>"
 
+            elif postdata[key][0] == 'True':
+                frame = "{feature} <input type = 'radio' value = 'True' name = '{feature}' checked = 'checked'><input type = 'radio' value = 'False' name = '{feature}'>"
+
+            temp_list.append(frame.format(feature = key))
+
+        return_html = ''.join(temp_list)
+        print "RETURNING...",return_html
+        return return_html
 
 test_list = (
 "foo",

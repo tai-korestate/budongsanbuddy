@@ -66,29 +66,42 @@ def submit(request):
     #Handles Post Bullshit
  
     radio_form = radio_mach()    
-    radio_html = radio_form.gen_html()   
+    radio_html = radio_form.gen_html('submit')   
  
     pic_form = PicForm(request.POST, request.FILES)    
     pic_form2 = PicForm(request.POST, request.FILES)
     pic_form3 = PicForm(request.POST, request.FILES)
     #print pic_form.is_valid()
 
+    
     if request.method == 'POST' and pic_form.is_valid():
+        radio_data = radio_form.gen_storable(dict(request.POST))
+
         db_fetch = Properties()
         prop_info = request.POST         
         print "USSSSEEEEERRRRRR", request.FILES
         db_fetch.db_user = 'ass'  
 
         if pic_form.is_valid():
-            db_fetch.pics = request.FILES.getlist('picform')[0]     
+            try:
+                db_fetch.pics = request.FILES.getlist('picform')[0]     
         #print request.FILES
-  
-        if pic_form2.is_valid():
-            db_fetch.pics2 = request.FILES.getlist('picform')[1]    
+            except:
+                pass  
+
+
+        if pic_form2.is_valid(): 
+            try:
+                db_fetch.pics2 = request.FILES.getlist('picform')[1]    
         
+            except:
+                pass
+
         if pic_form3.is_valid():
-            db_fetch.pics3 = request.FILES.getlist('picform')[2]     
-        
+            try:
+                db_fetch.pics3 = request.FILES.getlist('picform')[2]     
+            except:
+                pass
 
  
         db_fetch.account_ref = account_hash
@@ -96,8 +109,12 @@ def submit(request):
         db_fetch.property_name = prop_info["prop_name"]
         db_fetch.description = prop_info["description"]
         db_fetch.phone_number = prop_info["phone_number"]        
+        db_fetch.radio_array = radio_data
         db_fetch.save() 
         status = "Post Submitted" 
+        for key in request.POST:
+            print key
+        #print request.POST
 
     else:
         status = "Enter Info to add to Korestate DB"
@@ -155,19 +172,27 @@ def edit_manager(request):  #No status return yet
 
 
 def edit_mode(request):
+ 
+    radio_form = radio_mach()    
+ 
+
+
     print "EDIT MODE"
     print "NEW REQ,", request.GET
     status = "Please Type Changes and click submit."
     try:
         if request.GET['revisions'] == 't':
+          
             update_req = request.POST
+            radio_data = radio_form.gen_storable(dict(request.POST))
+           
             print "REQ INFO", update_req
             to_update = Properties.objects.all().filter(pk = update_req[u'pk'])[0]
             print "UPDATING...", to_update
             to_update.broker_name = update_req[u'broker_name'] 
             to_update.property_name = update_req[u'property_name']
             to_update.description = update_req[u'description']
-            to_update.radio_array = update_req[u'radio_array']
+            to_update.radio_array = radio_data
             to_update.save()
             status = "Changes Successfully Made  <a href = '/submit'> go back</a> "
 
@@ -183,7 +208,9 @@ def edit_mode(request):
         return HttpResponseRedirect('/accounts/fail?err=Database Error 404::Bad Navigation')
     
 
+
     db_fetch = Properties.objects.all().filter(pk=edit_key)[0]
+    print "DB FEEECTCH ::::: ",radio_form.gen_for_edit(eval(db_fetch.radio_array))
     template = "edit_site.html"
     prop_sheet = {
         "pk" : db_fetch.pk,
@@ -192,7 +219,7 @@ def edit_mode(request):
         "property_name" : db_fetch.property_name,
         "description" :  db_fetch.description,
         "phone_number" :  db_fetch.phone_number,
-        "radio_array" :   db_fetch.radio_array,      
+        "radio_array" : radio_form.gen_for_edit(eval(db_fetch.radio_array)),      
         "status" : status,
     }
 

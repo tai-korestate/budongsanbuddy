@@ -31,4 +31,4 @@ class Properties(models.Model):
 
 
     def __str__(self):
-        return str(self.post_date)
+        return str(account_ref)+ " - " + str(broker_name) +)" - " str(self.post_date)

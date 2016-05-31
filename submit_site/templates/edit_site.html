@@ -13,15 +13,19 @@
 {% endfor  %}
 <br/>
 Broker Name: <input type = text name = "broker_name" value = {{broker_name}}><br>
+
+
 Property Name: <input type = text name = "property_name" value = {{property_name}}><br>
-{{radio_form}}
+
+{% autoescape off %}
+{{radio_array}}
+{% endautoescape %}
 
 Description: <textarea name = "description" value = {{description}}>{{description}}</textarea><br>
 Phone Number: <input type = text name = "phone_number" value = {{phone_number}}><br>
 
 
 
-<input type = "hidden" name = "radio_array" value = "NOPE">
 {% autoescape off  %}
 {{status}}
 {% endautoescape %}
