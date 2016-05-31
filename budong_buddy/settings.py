@@ -126,4 +126,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 LOGIN_URL = '/accounts'
+
+MEDIA_ROOT = os.path.join(BASE_DIR,'static')
 STATIC_URL = '/static/'
