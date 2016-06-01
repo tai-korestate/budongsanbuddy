@@ -1,4 +1,4 @@
-
+import boto3 # Handles the aws tools
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.shortcuts import redirect
@@ -6,9 +6,9 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from . import test_site as ts
 #from . import post_obj_ops as po
-from .models import Properties
+#from .models import Properties
 from .forms  import PicForm,radio_mach
-
+import models
 
 def assemble_post_views(prop_obj):
     p = prop_obj
@@ -49,6 +49,13 @@ def assemble_post_views(prop_obj):
 
 def submit(request):
 
+
+    print request.user.email
+    print request.user.username
+    print request.user.first_name
+    print request.user.last_name
+
+    print "%s has LOGGED IN." % request.user
     print request.user.is_authenticated()
     if not request.user.is_authenticated():
         return redirect(settings.LOGIN_URL, request.path)
@@ -76,11 +83,12 @@ def submit(request):
     
     if request.method == 'POST' and pic_form.is_valid():
         radio_data = radio_form.gen_storable(dict(request.POST))
-
-        db_fetch = Properties()
+        models.outer = request.user.username 
+        db_fetch = models.Properties()
         prop_info = request.POST         
-        print "USSSSEEEEERRRRRR", request.FILES
-        db_fetch.db_user = 'ass'  
+        
+        print "USSSSEEEEERRRRRR", db_fetch.db_user 
+
 
         if pic_form.is_valid():
             try:
@@ -121,7 +129,7 @@ def submit(request):
     
     
     test_site = ts.test_site()
-    post_list = Properties.objects.order_by('post_date')
+    post_list = models.Properties.objects.order_by('post_date')
     post_list = ''.join([assemble_post_views(post) for post in post_list if post.account_ref == account_hash])
     template = "index.html" 
 
@@ -151,7 +159,7 @@ def edit_manager(request):  #No status return yet
         print 'COMMANDS',commands 
         if commands[u'del'] == u'1':
             try:
-                Properties.objects.all().filter(pk = int(commands['ord'])).delete()
+                models.Properties.objects.all().filter(pk = int(commands['ord'])).delete()
                 return HttpResponseRedirect('/submit')
  
             except:
@@ -209,7 +217,7 @@ def edit_mode(request):
     
 
 
-    db_fetch = Properties.objects.all().filter(pk=edit_key)[0]
+    db_fetch = models.Properties.objects.all().filter(pk=edit_key)[0]
     print "DB FEEECTCH ::::: ",radio_form.gen_for_edit(eval(db_fetch.radio_array))
     template = "edit_site.html"
     prop_sheet = {

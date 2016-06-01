@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^submit/', include("submit_site.urls")),
     url(r'^accounts/', include("login.urls")),
+    url(r'^profile/', include("profile_app.urls")),
 ]
 
 
@@ -30,5 +31,5 @@ if settings.DEBUG:
     urlpatterns += [
            url(r'^media/(?P<path>.*)$', 'django.views.static.serve',{'document_root':settings.MEDIA_ROOT}),
            url(r'^static/(?P<path>.*)$','django.views.static.serve',{'document_root':settings.STATIC_ROOT})
-
+ 
     ]

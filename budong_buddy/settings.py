@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'submit_site.apps.SubmitSiteConfig',
     'login.apps.LoginConfig',
+    'profile_app.apps.ProfileAppConfig',
 ]
 
 MIDDLEWARE_CLASSES = [

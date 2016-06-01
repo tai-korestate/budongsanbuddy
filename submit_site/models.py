@@ -4,9 +4,11 @@ from django.db import models
 
 # Create your models here.
 
+outer = "unknown"
+
 class Properties(models.Model):
 
-    db_user = "unknown"
+    db_user = outer
 
     account_ref = models.CharField(max_length = 64)
 
