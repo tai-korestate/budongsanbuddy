@@ -36,9 +36,9 @@ def assemble_post_views(prop_obj):
     </div><br/>>
     """.encode('utf-8')
 
-    return unicode(frame).format(image ='/media/' + str(p.pics),
+    return unicode(frame).format(image = '/media/' +str(p.pics),
                         image2 = '/media/' + str(p.pics2),
-                        image3 = '/media/' + str(p.pics3),
+                        image3 = '/media/'+ str(p.pics3),
                         prop_name = p.property_name,
                         broker = p.broker_name,
                         postdate = p.post_date,
@@ -92,10 +92,13 @@ def submit(request):
         print dir(request.FILES['picform'])
         print "USSSSEEEEERRRRRR", db_fetch.db_user 
 
+        s3_frame = "https://s3.ap-northeast-2.amazonaws.com/korestate/images/{}"
+
 
         if pic_form.is_valid():
             try:
-                db_fetch.pics = request.FILES.getlist('picform')[0]     
+                #db_fetch.pics = s3_frame.format(request.FILES.getlist('picform')[0])     
+                db_fetch.pics = request.FILES.getlist('picform')[0]
         #print request.FILES
             except:
                 pass  
@@ -103,14 +106,15 @@ def submit(request):
 
         if pic_form2.is_valid(): 
             try:
-                db_fetch.pics2 = request.FILES.getlist('picform')[1]    
-        
+                #db_fetch.pics2 = s3_frame.format(request.FILES.getlist('picform')[1])    
+                db_fetch.pics2 = request.FILES.getlist('picform')[1]
             except:
                 pass
 
         if pic_form3.is_valid():
             try:
-                db_fetch.pics3 = request.FILES.getlist('picform')[2]     
+                #db_fetch.pics3 = s3_frame.format(request.FILES.getlist('picform')[2])     
+                db_fetch.pics = request.FILES.getlist('picform')[2]
             except:
                 pass
 
