@@ -1,4 +1,5 @@
 import os
+import sys
 import boto3 # Handles the aws tools
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -6,12 +7,15 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 
+
 from . import s3_handler as s3
 from . import test_site as ts
 #from . import post_obj_ops as po
 #from .models import Properties
 from .forms  import PicForm,radio_mach
 import models
+
+LOCAL_SAVE = False #For Debug
 
 def assemble_post_views(prop_obj):
     p = prop_obj
@@ -36,9 +40,9 @@ def assemble_post_views(prop_obj):
     </div><br/>>
     """.encode('utf-8')
 
-    return unicode(frame).format(image = '/media/' +str(p.pics),
-                        image2 = '/media/' + str(p.pics2),
-                        image3 = '/media/'+ str(p.pics3),
+    return unicode(frame).format(image = str(p.pics),
+                        image2 = str(p.pics2),
+                        image3 = str(p.pics3),
                         prop_name = p.property_name,
                         broker = p.broker_name,
                         postdate = p.post_date,
@@ -51,7 +55,7 @@ def assemble_post_views(prop_obj):
 
 
 def submit(request):
-    s3.write_all()
+    """
     print "?????????????????", os.listdir('./media')
     print request.user.email
     print request.user.username
@@ -60,6 +64,8 @@ def submit(request):
 
     print "%s has LOGGED IN." % request.user
     print request.user.is_authenticated()
+    """
+
     if not request.user.is_authenticated():
         return redirect(settings.LOGIN_URL, request.path)
 
@@ -85,6 +91,7 @@ def submit(request):
 
     
     if request.method == 'POST' and pic_form.is_valid():
+        s3.write_all()
         radio_data = radio_form.gen_storable(dict(request.POST))
         models.outer = request.user.username 
         db_fetch = models.Properties()
@@ -97,8 +104,8 @@ def submit(request):
 
         if pic_form.is_valid():
             try:
-                #db_fetch.pics = s3_frame.format(request.FILES.getlist('picform')[0])     
-                db_fetch.pics = request.FILES.getlist('picform')[0]
+                db_fetch.pics = s3_frame.format(request.FILES.getlist('picform')[0])     
+                if LOCAL_SAVE_ == True: db_fetch.pics = request.FILES.getlist('picform')[0]  #ENABLE FOR LOCAL
         #print request.FILES
             except:
                 pass  
@@ -106,15 +113,15 @@ def submit(request):
 
         if pic_form2.is_valid(): 
             try:
-                #db_fetch.pics2 = s3_frame.format(request.FILES.getlist('picform')[1])    
-                db_fetch.pics2 = request.FILES.getlist('picform')[1]
+                db_fetch.pics2 = s3_frame.format(request.FILES.getlist('picform')[1])    
+                if LOCAL_SAVE == True: db_fetch.pics2 = request.FILES.getlist('picform')[1]
             except:
                 pass
 
         if pic_form3.is_valid():
             try:
-                #db_fetch.pics3 = s3_frame.format(request.FILES.getlist('picform')[2])     
-                db_fetch.pics = request.FILES.getlist('picform')[2]
+                db_fetch.pics3 = s3_frame.format(request.FILES.getlist('picform')[2])     
+                if LOCAL_SAVE == True: db_fetch.pics = request.FILES.getlist('picform')[2]
             except:
                 pass
 
@@ -127,9 +134,6 @@ def submit(request):
         db_fetch.radio_array = radio_data
         db_fetch.save() 
         status = "Post Submitted" 
-        for key in request.POST:
-            print key
-        #print request.POST
 
     else:
         status = "Enter Info to add to Korestate DB"
@@ -149,7 +153,7 @@ def submit(request):
                 "image_form3" : pic_form,
                 "radio_form" : radio_html,
               } 
-   
+    s3.flush('./static/unknown/')   
     return render(request,template,context)
 
 
@@ -202,7 +206,7 @@ def edit_mode(request):
             radio_data = radio_form.gen_storable(dict(request.POST))
            
             print "REQ INFO", update_req
-            to_update = Properties.objects.all().filter(pk = update_req[u'pk'])[0]
+            to_update = models.Properties.objects.all().filter(pk = update_req[u'pk'])[0]
             print "UPDATING...", to_update
             to_update.broker_name = update_req[u'broker_name'] 
             to_update.property_name = update_req[u'property_name']
@@ -213,7 +217,7 @@ def edit_mode(request):
 
     except:
         status = "Update error"
-    
+        print status, sys.exc_info()    
     try:
         edit_conf = request.GET['ed']
         edit_key = request.GET['ky']

@@ -8,7 +8,7 @@
 
 {% for pic in pics %}
     {% autoescape off %}
-    <img style = "height: 200px" src = '/media/{{pic}}' > 
+    <a href = "{{pic}}" ><img style = "height: 200px" src = '{{pic}}' > </a>
     {% endautoescape %}
 {% endfor  %}
 <br/>
