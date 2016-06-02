@@ -1,9 +1,12 @@
+import os
 import boto3 # Handles the aws tools
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
+
+from . import s3_handler as s3
 from . import test_site as ts
 #from . import post_obj_ops as po
 #from .models import Properties
@@ -48,8 +51,8 @@ def assemble_post_views(prop_obj):
 
 
 def submit(request):
-
-
+    s3.write_all()
+    print "?????????????????", os.listdir('./media')
     print request.user.email
     print request.user.username
     print request.user.first_name
@@ -86,7 +89,7 @@ def submit(request):
         models.outer = request.user.username 
         db_fetch = models.Properties()
         prop_info = request.POST         
-        
+        print dir(request.FILES['picform'])
         print "USSSSEEEEERRRRRR", db_fetch.db_user 
 
 
@@ -111,7 +114,7 @@ def submit(request):
             except:
                 pass
 
- 
+        s3.write_all("./static/unknown") 
         db_fetch.account_ref = account_hash
         db_fetch.broker_name = prop_info["broker_name"]
         db_fetch.property_name = prop_info["prop_name"]
